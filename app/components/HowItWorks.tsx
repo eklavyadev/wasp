@@ -43,7 +43,7 @@ const steps = [
 
 export default function HowItWorks() {
   return (
-    <section id="how-it-works" className="bg-[#020817] px-6 py-24">
+    <section id="how-it-works" className="bg-zinc-950 px-6 py-24">
       <div className="mx-auto max-w-6xl">
 
         {/* Header */}
