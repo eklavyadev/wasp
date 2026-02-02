@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import HowItWorks from "./components/HowItWorks";
 
 
 export default function Home() {
@@ -59,7 +60,7 @@ export default function Home() {
           </h1>
 
           <p className="mt-6 max-w-2xl mx-auto text-lg md:text-xl text-zinc-400 leading-relaxed">
-            WASP is a prototype system that validates citizen inputs into reliable flood alerts under municipal oversight
+            WASP is a prototype system that validates citizen inputs into reliable flood/drain alerts under municipal oversight
           </p>
         </div>
 
@@ -138,7 +139,7 @@ export default function Home() {
           </Link>
         </div>
         </main>
-
+    <HowItWorks/>
 
 
     </div>
