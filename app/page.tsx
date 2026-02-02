@@ -1,18 +1,10 @@
 import Image from "next/image";
+import Link from "next/link";
+
 
 export default function Home() {
   return (
     <>
-    <div className="min-h-screen bg-zinc-950 text-zinc-200 relative overflow-hidden">
-
-    <div
-        className="absolute inset-0 pointer-events-none opacity-20"
-        style={{
-          backgroundImage:
-            "linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px)",
-          backgroundSize: "40px 40px"
-        }}
-      />
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-zinc-800 bg-zinc-950/70 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
@@ -47,7 +39,6 @@ export default function Home() {
           </div>
         </div>
       </nav>
-      </div>
     </>
   );
 }
