@@ -52,7 +52,7 @@ export function ApprovedReports() {
       .then((data) => {
         if (Array.isArray(data)) {
           // Accepting pending or approved to ensure data shows up
-          const visible = data.filter(r => ['approved', 'pending'].includes(r.status?.toLowerCase()));
+          const visible = data.filter(r => ['approved'].includes(r.status?.toLowerCase()));
           setReports(visible);
         }
         setLoading(false);
