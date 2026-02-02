@@ -67,11 +67,30 @@ export default function AdminPage() {
       });
       if (!res.ok) throw new Error();
       
-      // Local update for snappy UI
       setReports(prev => prev.map(r => r.id === id ? { ...r, status } : r));
       showToast(`Signal marked as ${status}`);
     } catch (err) {
       showToast('Update failed');
+    }
+  };
+
+  const deleteReport = async (id: string) => {
+    const ok = confirm('This will permanently delete this report from the database. Continue?');
+    if (!ok) return;
+
+    try {
+      const res = await fetch(`/api/admin/reports/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (res.ok) {
+        setReports((prev) => prev.filter((r) => r.id !== id));
+        showToast('🗑 Report permanently deleted');
+      } else {
+        throw new Error();
+      }
+    } catch (err) {
+      showToast('❌ Delete failed');
     }
   };
 
@@ -103,7 +122,9 @@ export default function AdminPage() {
             <h1 className="text-3xl font-black tracking-tighter uppercase">Incident Control</h1>
             <p className="text-slate-500 text-sm">Managing urban resilience signals for Guwahati</p>
           </div>
-          <button onClick={fetchReports} className="text-xs bg-slate-800 px-4 py-2 rounded-full border border-slate-700 hover:bg-slate-700">Refresh Feed</button>
+          <button onClick={fetchReports} className="text-xs bg-slate-800 px-4 py-2 rounded-full border border-slate-700 hover:bg-slate-700 transition-all active:scale-95">
+            {loading ? 'Syncing...' : 'Refresh Feed'}
+          </button>
         </header>
 
         {/* Tabs with Counts */}
@@ -130,10 +151,10 @@ export default function AdminPage() {
             {filteredReports.map((r) => (
               <div key={r.id} className="border border-slate-800 rounded-2xl bg-[#0f172a] overflow-hidden flex flex-col group hover:border-teal-500/50 transition-all">
                 <div className="relative h-56 bg-black">
-                    <img src={r.image_url} alt="Incident Evidence" className="h-full w-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
-                    <div className={`absolute top-4 right-4 px-3 py-1 rounded-full border text-[10px] font-black uppercase tracking-widest ${IMPACT_BADGE[r.impact_level]}`}>
-                        Level {r.impact_level}
-                    </div>
+                  <img src={r.image_url} alt="Incident Evidence" className="h-full w-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+                  <div className={`absolute top-4 right-4 px-3 py-1 rounded-full border text-[10px] font-black uppercase tracking-widest ${IMPACT_BADGE[r.impact_level]}`}>
+                    Level {r.impact_level}
+                  </div>
                 </div>
 
                 <div className="p-5 flex-1">
@@ -141,27 +162,38 @@ export default function AdminPage() {
                     <h3 className="font-bold text-teal-400 text-lg">{r.type}</h3>
                     <span className="text-[10px] font-mono text-slate-500">{new Date(r.created_at).toLocaleTimeString()}</span>
                   </div>
-                  
-                  <div className="space-y-3 text-sm">
-                    <div className="flex gap-2 italic text-slate-300 bg-slate-800/50 p-2 rounded-lg">
-                      <span className="text-teal-500">📍</span>
-                      <p className="leading-tight">{r.landmark || r.location}</p>
-                    </div>
+                  <div className="flex gap-2 italic text-slate-300 bg-slate-800/50 p-2 rounded-lg text-sm">
+                    <span className="text-teal-500">📍</span>
+                    <p className="leading-tight">{r.landmark || r.location}</p>
                   </div>
                 </div>
 
-                {/* Intelligent Action Bar */}
-                <div className="p-4 bg-slate-900/80 border-t border-slate-800 flex gap-2">
+                {/* Dynamic Action Bar */}
+                <div className="p-4 bg-slate-900/80 border-t border-slate-800 flex flex-col gap-2">
                   {activeTab === 'pending' && (
-                    <>
+                    <div className="flex gap-2">
                       <button onClick={() => updateStatus(r.id, 'approved')} className="flex-1 bg-teal-600 hover:bg-teal-500 py-2 rounded-lg text-xs font-bold transition-colors">Approve</button>
                       <button onClick={() => updateStatus(r.id, 'rejected')} className="flex-1 bg-slate-800 hover:bg-red-900 py-2 rounded-lg text-xs font-bold border border-slate-700">Reject</button>
-                    </>
+                    </div>
                   )}
+
                   {activeTab === 'approved' && (
-                    <button onClick={() => updateStatus(r.id, 'resolved')} className="w-full bg-white text-black hover:bg-teal-400 py-2 rounded-lg text-xs font-black uppercase tracking-tighter">Mark as Resolved</button>
+                    <button onClick={() => updateStatus(r.id, 'resolved')} className="w-full bg-white text-black hover:bg-teal-400 py-2 rounded-lg text-xs font-black uppercase tracking-tighter transition-all">Mark as Resolved</button>
                   )}
-                  {(activeTab === 'resolved' || activeTab === 'rejected') && (
+
+                  {activeTab === 'rejected' && (
+                    <div className="flex flex-col gap-2">
+                      <button onClick={() => updateStatus(r.id, 'pending')} className="w-full border border-slate-700 py-2 rounded-lg text-xs text-slate-400 hover:bg-slate-800">Restore to Pending</button>
+                      <button 
+                        onClick={() => deleteReport(r.id)} 
+                        className="w-full bg-red-900/20 border border-red-900/50 text-red-400 hover:bg-red-600 hover:text-white py-2 rounded-lg text-xs font-bold transition-all"
+                      >
+                        🗑 Delete Permanently
+                      </button>
+                    </div>
+                  )}
+
+                  {activeTab === 'resolved' && (
                     <button onClick={() => updateStatus(r.id, 'pending')} className="w-full border border-slate-700 py-2 rounded-lg text-xs text-slate-400 hover:bg-slate-800">Restore to Pending</button>
                   )}
                 </div>
@@ -172,7 +204,7 @@ export default function AdminPage() {
       </div>
 
       {toast && (
-        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 bg-teal-500 text-black px-6 py-3 rounded-full shadow-2xl font-bold animate-bounce text-sm">
+        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 bg-teal-500 text-black px-6 py-3 rounded-full shadow-2xl font-bold animate-bounce text-sm z-50">
           {toast}
         </div>
       )}
