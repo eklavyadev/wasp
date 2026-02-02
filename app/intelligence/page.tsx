@@ -58,7 +58,7 @@ export default function IntelligenceDashboard() {
       fetch('/api/weather').then(res => res.json())
     ]).then(([reportData, weatherData]) => {
       if (Array.isArray(reportData)) {
-        setReports(reportData.filter(r => r.status !== 'rejected'));
+        setReports(reportData.filter(r => r.status == 'approved'));
       }
       if (!weatherData.error) {
         setWeather(weatherData);

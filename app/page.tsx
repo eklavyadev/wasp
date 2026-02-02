@@ -72,7 +72,7 @@ export default function Home() {
           </Link>
 
           {/* DASHBOARD CARD */}
-          <Link href="/dashboard" className="group">
+          <Link href="/intelligence" className="group">
             <div className="relative overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/50 p-8 transition hover:border-cyan-500/50 hover:bg-zinc-900 cursor-pointer">
               <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition">
                 <svg
