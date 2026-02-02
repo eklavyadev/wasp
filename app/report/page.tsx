@@ -112,12 +112,14 @@ export default function ReportWaspIssuePage() {
 
     const finalLocation = landmark.trim() ? `${landmark.trim()}, ${autoLocation}` : autoLocation;
 
+    // Inside your submitReport function in page.tsx
     const formData = new FormData();
     formData.append('image', image);
-    formData.append('location', finalLocation);
+    formData.append('location', autoLocation); // This is the address from Google
+    formData.append('landmark', landmark.trim()); // Ensure this matches the API key
     formData.append('lat', String(lat));
     formData.append('lng', String(lng));
-    formData.append('type', issueType);
+    formData.append('type', issueType === 'flooding' ? 'Flash Flood' : 'Drain Blockage');
     formData.append('impact_level', String(impactLevel));
 
     try {
