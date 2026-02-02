@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import imageCompression from 'browser-image-compression';
+import Navbar from '../components/Navbar';
 
 /* ---------- IMAGE COMPRESSION ---------- */
 async function compressImage(file: File) {
@@ -147,6 +148,7 @@ export default function ReportWaspIssuePage() {
 
   return (
     <div className="min-h-screen bg-[#020817] text-white px-6 py-20">
+      <Navbar />
       <div className="mx-auto max-w-xl bg-[#0f172a] p-8 rounded-2xl border border-slate-700 shadow-2xl">
         <div className="flex items-center gap-2 mb-2">
             <h1 className="text-2xl font-bold">Report Issue</h1>
