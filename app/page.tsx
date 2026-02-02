@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import HowItWorks from "./components/HowItWorks";
+import { ApprovedReports } from "./components/ApprovedReports";
 
 
 export default function Home() {
@@ -141,7 +142,7 @@ export default function Home() {
         </main>
     <HowItWorks/>
 
-
+    <ApprovedReports/>
     </div>
     </>
   );

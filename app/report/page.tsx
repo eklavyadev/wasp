@@ -16,7 +16,7 @@ async function compressImage(file: File) {
 
 /* ---------- CONSTANTS ---------- */
 const MAX_SIZE_MB = 10;
-const MAX_GPS_ACCURACY = 250; 
+const MAX_GPS_ACCURACY = 200; 
 
 const IMPACT_LABELS: Record<string, { value: number; label: string }[]> = {
   flooding: [
