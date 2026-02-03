@@ -167,7 +167,7 @@ export default function FullScreenMapPage() {
 
         {/* Floating Top Right Signal Count */}
         <div className="absolute top-6 right-6 bg-zinc-900 text-white px-5 py-3 rounded-2xl shadow-2xl z-10 hidden sm:block border border-zinc-800">
-          <p className="text-[9px] font-black text-teal-500 uppercase tracking-widest">Active Signals</p>
+          <p className="text-[9px] font-black text-teal-500 uppercase tracking-widest">Active Reports</p>
           <p className="text-2xl font-black">{reports.length}</p>
         </div>
       </main>
