@@ -30,7 +30,7 @@ export default function Navbar() {
                 WASP
               </span>
               <span className="text-[10px] text-teal-500 font-bold tracking-[0.2em] leading-none uppercase">
-                Intelligence
+                Water Alert System Prototype
               </span>
             </div>
           </Link>
