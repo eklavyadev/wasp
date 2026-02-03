@@ -98,7 +98,7 @@ export default function AdminPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#020817] p-6">
         <div className="border border-slate-800 p-8 rounded-2xl w-full max-w-md bg-[#0f172a] shadow-2xl">
-          <h2 className="text-2xl font-bold mb-6 text-white tracking-tight text-center text-teal-500">WASP Command</h2>
+          <h2 className="text-2xl font-bold mb-6 text-white tracking-tight text-center text-teal-500">WASP Admin Panel</h2>
           <input
             type="password"
             placeholder="Security Token"
@@ -119,8 +119,8 @@ export default function AdminPage() {
       <div className="max-w-7xl mx-auto">
         <header className="flex justify-between items-end mb-10">
           <div>
-            <h1 className="text-3xl font-black tracking-tighter uppercase">Incident Control</h1>
-            <p className="text-slate-500 text-sm">Managing urban resilience signals for Guwahati</p>
+            <h1 className="text-3xl font-black tracking-tighter uppercase">Admin Panel</h1>
+            <p className="text-slate-500 text-sm">Managing urban resilience reports for Guwahati</p>
           </div>
           <button onClick={fetchReports} className="text-xs bg-slate-800 px-4 py-2 rounded-full border border-slate-700 hover:bg-slate-700 transition-all active:scale-95">
             {loading ? 'Syncing...' : 'Refresh Feed'}
