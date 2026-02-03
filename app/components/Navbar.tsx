@@ -61,7 +61,7 @@ export default function Navbar() {
               href="/report"
               className="bg-teal-600 hover:bg-teal-500 text-zinc-950 text-xs font-black px-4 py-2 rounded-full transition-all shadow-lg active:scale-95"
             >
-              REPORT SIGNAL
+              REPORT ISSUES
             </Link>
           </div>
 

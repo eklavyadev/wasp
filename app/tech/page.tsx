@@ -10,7 +10,8 @@ import {
   Map as MapIcon, 
   Zap, 
   ShieldCheck, 
-  Search 
+  Search,
+  MessageSquare // Added for Twilio
 } from "lucide-react";
 
 export default function TechStackPage() {
@@ -29,8 +30,8 @@ export default function TechStackPage() {
             The WASP <span className="text-teal-500">Engine</span>
           </h1>
           <p className="text-slate-400 text-lg leading-relaxed">
-            A specialized stack engineered for high-precision water logging detection, 
-            automated drainage moderation, and real-time civic geospatial analysis.
+            A specialized stack engineered for high-precision flood detection, 
+            automated municipal alerting, and real-time civic geospatial analysis.
           </p>
         </div>
 
@@ -43,97 +44,75 @@ export default function TechStackPage() {
             <TechCard 
               icon={<Zap className="text-teal-500" />}
               title="Next.js 14 (App Router)"
-              desc="High-performance React framework handling SSR for SEO-friendly reports and client-side hydration for interactive maps."
+              desc="Optimized server actions for seamless data submission and high-performance server-side rendering of incident maps."
             />
             <TechCard 
               icon={<Database className="text-teal-500" />}
-              title="Supabase & PostgreSQL"
-              desc="Cloud-native database storing complex geospatial coordinates, high-res evidence, and real-time signal status."
+              title="Supabase & PostGIS"
+              desc="Using PostgreSQL with geospatial extensions to calculate duplicate reports within a 50m radius automatically."
             />
             <TechCard 
-              icon={<ShieldCheck className="text-teal-500" />}
-              title="Tailwind CSS & Framer"
-              desc="Utility-first styling paired with motion APIs for a responsive, high-contrast 'Control Center' interface."
+              icon={<MessageSquare className="text-teal-500" />}
+              title="Twilio WhatsApp API"
+              desc="Instant dispatch system routing verified flood reports directly to regional municipal officers' mobile devices."
             />
             <TechCard 
               icon={<Cloud className="text-teal-500" />}
               title="Vercel Edge Network"
-              desc="Global distribution layer ensuring low-latency access to the public API and static map assets."
+              desc="Global distribution layer ensuring low-latency access to the public API and real-time dashboard updates."
             />
           </div>
         </section>
 
-        {/* AI MODERATION LAYER */}
+        {/* AI & VERIFICATION LAYER */}
         <section className="space-y-8">
           <div className="flex items-center gap-3 border-l-4 border-teal-500 pl-4">
-            <h2 className="text-2xl font-black uppercase tracking-tight">AI & Signal Verification</h2>
+            <h2 className="text-2xl font-black uppercase tracking-tight">AI & Report Moderation</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <TechCard 
               icon={<Search className="text-teal-500" />}
-              title="Hugging Face Vision Transformers"
-              desc="Custom-trained models used to verify 'Water Depth' and 'Drain Blockage' images, filtering out 98% of spam uploads."
+              title="Groq Llama-4-Scout Vision"
+              desc="Edge-speed Vision AI verifying if uploaded images contain actual flooding or drainage blockages before public broadcast."
             />
             <TechCard 
-              icon={<Cpu className="text-teal-500" />}
-              title="Node.js Microservice (Render)"
-              desc="A dedicated compute layer that processes incoming reports asynchronously to prevent UI blocking during peak monsoons."
+              icon={<ShieldCheck className="text-teal-500" />}
+              title="Automated Impact Scoring"
+              desc="A categorical severity engine that ranks incidents (Low, Medium, High) to prioritize municipal response teams."
             />
           </div>
         </section>
 
-        {/* GOOGLE CLOUD INTEGRATION */}
-        <section className="p-8 rounded-[2.5rem] bg-gradient-to-br from-slate-900 to-black border border-teal-500/30 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 p-10 opacity-10 group-hover:opacity-20 transition-opacity">
-            <Globe size={120} />
-          </div>
-          <div className="relative z-10 space-y-6">
-            <h2 className="text-3xl font-black text-white flex items-center gap-3">
-              <MapIcon className="text-teal-400" /> Google Maps Platform
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 text-slate-300">
-              <div className="space-y-2">
-                <p className="font-bold text-teal-400">Advanced Markers API</p>
-                <p className="text-sm leading-relaxed">Dynamic rendering of impact-level colored pins with custom SVG scaling for critical infrastructure visualization.</p>
-              </div>
-              <div className="space-y-2">
-                <p className="font-bold text-teal-400">Reverse Geocoding</p>
-                <p className="text-sm leading-relaxed">Converting raw GPS data into human-readable locations like "G.S. Road, Guwahati" automatically upon user upload.</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* DATA FLOW DIAGRAM */}
+        {/* UPDATED DATA FLOW DIAGRAM */}
         <section className="space-y-8">
           <div className="flex items-center gap-3 border-l-4 border-teal-500 pl-4">
-            <h2 className="text-2xl font-black uppercase tracking-tight">System Data Flow</h2>
+            <h2 className="text-2xl font-black uppercase tracking-tight">Real-Time Alert Pipeline</h2>
           </div>
+          
           <div className="p-8 rounded-3xl bg-slate-900/50 border border-slate-800 font-mono text-xs md:text-sm text-teal-500 space-y-4 leading-relaxed">
             <div className="flex items-center gap-4">
               <div className="w-8 h-8 rounded bg-teal-500/20 flex items-center justify-center">01</div>
-              <p className="text-slate-300">Client captures <span className="text-white">Camera + Geo-Location</span> data via Browser APIs.</p>
+              <p className="text-slate-300">Citizen captures <span className="text-white">Image + GPS</span>; frontend handles duplicate prevention.</p>
             </div>
             <div className="flex items-center gap-4">
               <div className="w-8 h-8 rounded bg-teal-500/20 flex items-center justify-center">02</div>
-              <p className="text-slate-300">Payload sent to <span className="text-white">Supabase Auth-Protected</span> storage and DB.</p>
+              <p className="text-slate-300">Groq <span className="text-white">Llama-4-Scout</span> verifies the image pixels for water-logging signatures.</p>
             </div>
             <div className="flex items-center gap-4">
               <div className="w-8 h-8 rounded bg-teal-500/20 flex items-center justify-center">03</div>
-              <p className="text-slate-300">Webhook triggers <span className="text-white">Vision AI</span> to classify and approve the report.</p>
+              <p className="text-slate-300">Twilio API dispatches a <span className="text-white">Priority WhatsApp Alert</span> to the Regional Zone Officer.</p>
             </div>
             <div className="flex items-center gap-4">
               <div className="w-8 h-8 rounded bg-teal-500/20 flex items-center justify-center">04</div>
-              <p className="text-slate-300">Global <span className="text-white">WASP Public API</span> and Map UI are updated in real-time.</p>
+              <p className="text-slate-300">The central <span className="text-white">Municipal Dashboard</span> updates the geospatial heatmap instantly.</p>
             </div>
           </div>
-          
         </section>
 
         {/* FOOTER */}
         <div className="text-center pb-20">
           <p className="text-[10px] font-mono text-slate-600 uppercase tracking-[0.3em]">
-            WASP Tech Stack · Version 2.4.0 · Open Infrastructure
+            WASP Engine · Guwahati SIH · Production-Ready API
           </p>
         </div>
       </div>
@@ -141,7 +120,6 @@ export default function TechStackPage() {
   );
 }
 
-/* ---------- HELPER COMPONENT ---------- */
 function TechCard({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
   return (
     <div className="p-6 rounded-3xl bg-slate-900/40 border border-slate-800 hover:border-teal-500/50 transition-all group">
