@@ -1,12 +1,17 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import Groq from "groq-sdk";
+import twilio from 'twilio';
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+// Initialize Supabase
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
+
+// Initialize Twilio
+const twilioClient = twilio(process.env.TWILIO_SID, process.env.TWILIO_AUTH_TOKEN);
+const TARGET_WHATSAPP = 'whatsapp:+918709436341';
+const TWILIO_SENDER = 'whatsapp:+14155238886'; 
 
 const DUPLICATE_RADIUS_METERS = 50; 
 
@@ -21,7 +26,7 @@ export async function POST(req: Request) {
     const lat = Number(formData.get('lat'));
     const lng = Number(formData.get('lng'));
     const type = formData.get('type') as string | null; 
-    const impactLevel = Number(formData.get('impact_level'));
+    const impactLevel = Number(formData.get('impact_level')); // Official scale (1, 2, or 3)
 
     /* ---------- 2. VALIDATION ---------- */
     if (!image || !location || !type || isNaN(lat) || isNaN(lng)) {
@@ -50,65 +55,64 @@ export async function POST(req: Request) {
 
     const { data: { publicUrl } } = supabase.storage.from('report-images').getPublicUrl(fileName);
 
-    /* ---------- 5. AI VERIFICATION (The Gatekeeper) ---------- */
-let finalStatus = 'pending';
-let aiReason = 'AI verification skipped';
+    /* ---------- 5. STATUS LOGIC ---------- */
+    // Defaulting to approved for official municipal signal stream
+    const finalStatus = 'approved';
 
-try {
-  const bytes = await image.arrayBuffer();
-  const base64Image = Buffer.from(bytes).toString('base64');
-
-  const chatCompletion = await groq.chat.completions.create({
-    messages: [
-      {
-        role: "user",
-        content: [
-          { type: "text", text: "Is this a flood? Return JSON: { \"verified\": boolean, \"reason\": \"string\" }" },
-          { type: "image_url", image_url: { url: `data:image/jpeg;base64,${base64Image}` } }
-        ]
-      }
-    ],
-    model: "meta-llama/llama-4-scout-17b-16e-instruct",
-    response_format: { type: "json_object" }
-  });
-
-  const aiResult = JSON.parse(chatCompletion.choices[0]?.message?.content || "{}");
-  
-  // IMMEDIATELY set the status based on AI result
-  finalStatus = aiResult.verified ? 'approved' : 'rejected';
-  aiReason = aiResult.reason;
-
-} catch (aiError) {
-  // Hackathon Survival: If AI fails, we still 'approve' for the demo
-  finalStatus = 'approved'; 
-  aiReason = "AI Timeout - Verified manually via system override.";
-}
-
-/* ---------- 6. SINGLE DB INSERTION ---------- */
-const { data: inserted, error: insertError } = await supabase
-  .from('reports')
-  .insert({
-    image_url: publicUrl,
-    location: location,
-    // We attach the AI reasoning to the landmark so it shows on your map
-    landmark: `${landmark || ''} (AI Analysis: ${aiReason})`.trim(),
-    lat: lat,
-    lng: lng,
-    type: type,
-    impact_level: impactLevel,
-    status: finalStatus, // <--- This is now pre-determined
-    governing_body: 'Guwahati Municipal'
-  })
-  .select()
-  .single();
+    /* ---------- 6. DB INSERTION ---------- */
+    const { data: inserted, error: insertError } = await supabase
+      .from('reports')
+      .insert({
+        image_url: publicUrl,
+        location: location,
+        landmark: landmark || 'None provided',
+        lat: lat,
+        lng: lng,
+        type: type,
+        impact_level: impactLevel,
+        status: finalStatus,
+        governing_body: 'Guwahati Municipal'
+      })
+      .select()
+      .single();
 
     if (insertError) throw insertError;
+
+    /* ---------- 7. OFFICIAL WHATSAPP ALERT ---------- */
+    try {
+      // Logic for Priority Labels and Icons
+      let priorityText = "🟢 LOW";
+      let alertIcon = "⚠️";
+      
+      if (impactLevel === 3) {
+        priorityText = "🔴 HIGH";
+        alertIcon = "‼️";
+      } else if (impactLevel === 2) {
+        priorityText = "🟡 MEDIUM";
+        alertIcon = "🔸";
+      }
+
+      await twilioClient.messages.create({
+        from: TWILIO_SENDER,
+        to: TARGET_WHATSAPP,
+        body: `${alertIcon} *MUNICIPAL INCIDENT ALERT* ${alertIcon}\n\n` +
+              `*Impact Level:* ${priorityText} (${impactLevel}/3)\n` +
+              `*Category:* ${type.toUpperCase()}\n` +
+              `*Location:* ${location}\n` +
+              `*Landmark:* ${landmark || 'N/A'}\n\n` +
+              `📍 *GPS View:* https://www.google.com/maps?q=${lat},${lng}\n\n` +
+              `_Sent via WASP Real-time Dispatch_`,
+        mediaUrl: [publicUrl]
+      });
+      console.log('WhatsApp Dispatch Successful');
+    } catch (twError) {
+      console.error('Twilio Error:', twError);
+    }
 
     return NextResponse.json({ 
       success: true, 
       reportId: inserted.id,
-      status: finalStatus,
-      message: finalStatus === 'approved' ? 'Report verified and published.' : 'Report flag for manual review.'
+      status: finalStatus
     });
 
   } catch (err: any) {
