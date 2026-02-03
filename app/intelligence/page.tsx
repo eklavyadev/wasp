@@ -179,7 +179,7 @@ export default function IntelligenceDashboard() {
 
             <div className="space-y-6">
               <h2 className="text-xl font-black flex items-center gap-2 uppercase tracking-tight">
-                <Activity className="text-teal-500" size={20} /> Signal Stream
+                <Activity className="text-teal-500" size={20} /> Alert Stream
               </h2>
 
               <div className="space-y-4">
