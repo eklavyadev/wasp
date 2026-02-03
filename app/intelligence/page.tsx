@@ -30,13 +30,14 @@ type Report = {
 
 type WeatherData = {
   rain24h: string | number;
+  rainChance: number;
   current: string;
   temp: number;
   humidity: number;
   error?: string;
 };
 
-// Dynamic Import for the HeatMap (Prevents SSR errors)
+// Dynamic Import for HeatMap
 const FloodHeatMap = dynamic(() => import('@/app/components/HeatMap'), { 
   ssr: false, 
   loading: () => <div className="h-[400px] bg-slate-900/50 animate-pulse rounded-[2.5rem] border border-slate-800" />
@@ -46,22 +47,40 @@ export default function IntelligenceDashboard() {
   const [reports, setReports] = useState<Report[]>([]);
   const [weather, setWeather] = useState<WeatherData>({ 
     rain24h: 0, 
-    current: 'Loading...', 
+    rainChance: 0, 
+    current: 'Syncing...', 
     temp: 0, 
     humidity: 0 
   });
   const [loading, setLoading] = useState(true);
 
+  // --- Helper: Convert % to Words ---
+  const getRainText = (chance: number) => {
+    if (chance === 0) return "No Rain";
+    if (chance < 30) return "Low Chance";
+    if (chance < 60) return "Possible Rain";
+    if (chance < 80) return "Likely Rain";
+    return "Heavy Rain";
+  };
+
   useEffect(() => {
     Promise.all([
-      fetch('/api/admin/reports').then(res => res.json()),
+      fetch('/api/admin/reports').then(res => res.json()).catch(() => []),
       fetch('/api/weather').then(res => res.json())
     ]).then(([reportData, weatherData]) => {
+      
       if (Array.isArray(reportData)) {
-        setReports(reportData.filter(r => r.status == 'approved'));
+        setReports(reportData.filter((r: any) => r.status === 'approved'));
       }
-      if (!weatherData.error) {
-        setWeather(weatherData);
+
+      if (weatherData && !weatherData.error) {
+        setWeather({
+          rain24h: weatherData.rain24h || 0,
+          rainChance: weatherData.rainChance || 0,
+          current: weatherData.current || 'Unavailable',
+          temp: weatherData.temp || 0,
+          humidity: weatherData.humidity || 0
+        });
       }
       setLoading(false);
     }).catch(err => {
@@ -70,7 +89,6 @@ export default function IntelligenceDashboard() {
     });
   }, []);
 
-  // Hotspot logic: 10 reports in same approximate 500m area
   const hotspots = useMemo(() => {
     const groups: Record<string, number> = {};
     reports.forEach((r: Report) => {
@@ -80,7 +98,7 @@ export default function IntelligenceDashboard() {
     return groups;
   }, [reports]);
 
-  const isRainfallCritical = Number(weather.rain24h) >= 60; 
+  const isRainfallCritical = Number(weather.rain24h) >= 60 || weather.rainChance > 80; 
   const hasDensityCrisis = Object.values(hotspots).some(v => v >= 10);
 
   return (
@@ -89,7 +107,7 @@ export default function IntelligenceDashboard() {
       
       <main className="max-w-7xl mx-auto px-6 pt-28 space-y-10">
         
-        {/* HEADER SECTION */}
+        {/* HEADER */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-2">
             <h1 className="text-4xl font-black tracking-tighter text-white uppercase">
@@ -103,23 +121,30 @@ export default function IntelligenceDashboard() {
           <div className="flex items-center gap-6 p-4 rounded-3xl bg-slate-900/50 border border-slate-800">
             <div className="flex items-center gap-2">
               <Thermometer size={16} className="text-orange-400" />
-              <span className="text-sm font-bold">{weather.temp}°C</span>
+              <span className="text-sm font-bold">{weather.temp ? Math.round(weather.temp) : '--'}°C</span>
             </div>
             <div className="flex items-center gap-2">
-              <Wind size={16} className="text-blue-400" />
-              <span className="text-sm font-bold">{weather.humidity}% Humidity</span>
+              <Droplets size={16} className="text-blue-400" />
+              <span className="text-sm font-bold">
+                {weather.humidity ? `${weather.humidity}%` : '--%'} Humidity
+              </span>
             </div>
           </div>
         </div>
 
         {/* METRICS BAR */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          
+          {/* --- UPDATED CARD: SHOWS WORDS --- */}
           <MetricCard 
-            title="Rainfall Outlook" 
-            value={`${weather.rain24h}mm`} 
+            title="Precipitation Probability" 
+            // MAIN VALUE: Shows "No Rain" instead of "0%"
+            value={getRainText(weather.rainChance)} 
             icon={<CloudRain className={isRainfallCritical ? "text-red-500 animate-bounce" : "text-blue-500"}/>} 
-            subtitle={isRainfallCritical ? "CRITICAL ( > 6CM )" : "Safe Levels"} 
+            // SUBTITLE: Keeps the data visible for accuracy
+            subtitle={`${weather.rainChance}% Chance / ${weather.rain24h}mm Vol`} 
           />
+          
           <MetricCard 
             title="Hotspots Detected" 
             value={Object.values(hotspots).filter(v => v >= 10).length.toString()} 
@@ -145,7 +170,6 @@ export default function IntelligenceDashboard() {
           {/* LEFT: LIVE INTELLIGENCE FEED */}
           <div className="lg:col-span-2 space-y-10">
             
-            {/* HEATMAP SECTION */}
             <div className="space-y-6">
               <h2 className="text-xl font-black flex items-center gap-2 uppercase tracking-tight">
                 <MapPin className="text-teal-500" size={20} /> Geospatial Risk Heatmap
@@ -153,7 +177,6 @@ export default function IntelligenceDashboard() {
               <FloodHeatMap reports={reports} />
             </div>
 
-            {/* SIGNAL LIST SECTION */}
             <div className="space-y-6">
               <h2 className="text-xl font-black flex items-center gap-2 uppercase tracking-tight">
                 <Activity className="text-teal-500" size={20} /> Signal Stream
@@ -172,7 +195,6 @@ export default function IntelligenceDashboard() {
                 ) : (
                   reports.map((r: Report) => {
                     const isHotspot = hotspots[`${r.lat.toFixed(3)},${r.lng.toFixed(3)}`] >= 10;
-                    
                     const getSeverityStyles = (level: number) => {
                       if (level >= 3) return "bg-red-500/20 text-red-500 border-red-500/40";
                       if (level === 2) return "bg-amber-500/20 text-amber-500 border-amber-500/40";
@@ -231,14 +253,14 @@ export default function IntelligenceDashboard() {
                 {isRainfallCritical ? (
                   <ActionItem 
                     title="CRITICAL EVACUATION" 
-                    text="6cm+ Rainfall limit breached. Triggering alerts for low-lying zones." 
+                    text="High Rainfall Probability / Volume breached. Triggering alerts." 
                     type="danger" 
                     icon={<AlertTriangle size={18}/>}
                   />
                 ) : (
                   <ActionItem 
                     title="ROUTINE MONITORING" 
-                    text="Rainfall levels currently within city safety parameters." 
+                    text="Precipitation levels currently within city safety parameters." 
                     type="normal" 
                     icon={<Droplets size={18}/>}
                   />
@@ -255,7 +277,7 @@ export default function IntelligenceDashboard() {
                 
                 <ActionItem 
                   title="SIGNAL BROADCAST" 
-                  text="Current humidity suggests high precipitation risk. Pumps on standby." 
+                  text={`Humidity at ${weather.humidity}%. Pumps on standby.`} 
                   type="normal" 
                   icon={<Wind size={18}/>}
                 />
@@ -277,7 +299,7 @@ export default function IntelligenceDashboard() {
   );
 }
 
-/* ---------- HELPER COMPONENTS ---------- */
+// --- HELPER COMPONENTS ---
 
 function MetricCard({ title, value, icon, subtitle }: { title: string; value: string; icon: any; subtitle: string }) {
   return (
@@ -291,7 +313,8 @@ function MetricCard({ title, value, icon, subtitle }: { title: string; value: st
         </div>
       </div>
       <div>
-        <p className="text-3xl font-black tracking-tighter text-white">{value}</p>
+        {/* Adjusted Font Size for Text Labels */}
+        <p className="text-2xl font-black tracking-tighter text-white">{value}</p>
         <p className="text-[10px] text-slate-600 font-bold uppercase tracking-tighter">{subtitle}</p>
       </div>
     </div>
