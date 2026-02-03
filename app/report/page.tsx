@@ -124,24 +124,53 @@ export default function ReportWaspIssuePage() {
     formData.append('impact_level', String(impactLevel));
 
     try {
-      const res = await fetch('/api/report/create', {
-        method: 'POST',
-        body: formData,
-      });
+  setLoading(true);
+  setError(''); // Clear previous errors
 
-      if (!res.ok) throw new Error('Network response was not ok');
+  const res = await fetch('/api/report/create', {
+    method: 'POST',
+    body: formData,
+  });
 
-      setSuccess(true);
-      setImage(null);
-      setLandmark('');
-      setLat(null);
-      setLng(null);
-      setAutoLocation('Location not fetched');
-    } catch (err) {
-      setError('Submission failed. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+  // Parse the JSON body once
+  const data = await res.json();
+
+  /* --- 1. HANDLE DUPLICATES (409) --- */
+  if (res.status === 409) {
+    setError('Duplicate detected: This area is already under surveillance.');
+    return;
+  }
+
+  /* --- 2. HANDLE AI REJECTION --- */
+  if (data.status === 'rejected') {
+    setError(`Verification Failed: ${data.message || 'The image does not show a flood.'}`);
+    return;
+  }
+
+  /* --- 3. HANDLE OTHER ERRORS (500, etc) --- */
+  if (!res.ok) {
+    throw new Error(data.error || 'Network response was not ok');
+  }
+
+  /* --- 4. SUCCESS STATE --- */
+  setSuccess(true);
+  
+  // LOG the AI reasoning to console (or you can set it to a state to show on screen)
+  console.log("AI Verification Logic:", data.status);
+
+  // Clear Form
+  setImage(null);
+  setLandmark('');
+  setLat(null);
+  setLng(null);
+  setAutoLocation('Location not fetched');
+
+} catch (err) {
+  console.error("Submission Error:", err);
+  setError(err instanceof Error ? err.message : 'Submission failed. Please try again.');
+} finally {
+  setLoading(false);
+}
   };
 
   if (!isMounted) return null;
