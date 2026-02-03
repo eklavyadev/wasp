@@ -75,7 +75,7 @@ export function ApprovedReports() {
       {/* ---------- HEADER SECTION ---------- */}
       <div className="mb-10 flex justify-between items-end border-b border-slate-800 pb-6">
         <div>
-          <h2 className="text-3xl font-black text-white tracking-tighter uppercase">Verified Signals</h2>
+          <h2 className="text-3xl font-black text-white tracking-tighter uppercase">Verified Issues</h2>
           <p className="text-slate-500 font-mono text-sm">Active Monitoring: {reports.length} Reports Detected</p>
         </div>
         <div className="hidden md:block text-right">

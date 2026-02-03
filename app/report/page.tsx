@@ -258,7 +258,7 @@ export default function ReportWaspIssuePage() {
         {/* Location Section */}
         <div className="bg-[#020817] border border-slate-700 rounded-xl p-5 mb-8">
             <div className="flex justify-between items-center mb-4">
-                <span className="text-sm font-bold text-gray-200">Fetch Location</span>
+                <span className="text-sm font-bold text-gray-200">Detect Location</span>
                 <button 
                     onClick={getLocation} 
                     className="bg-teal-500 text-black px-3 py-1.5 rounded-md text-[11px] font-black uppercase tracking-wider hover:bg-teal-400 transition"
