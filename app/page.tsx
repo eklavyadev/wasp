@@ -93,7 +93,7 @@ export default function Home() {
               </h3>
 
               <p className="text-zinc-400 mb-8 leading-relaxed">
-                View validated flood signals with confidence scores,
+                View validated flood reports with confidence scores,
                 prioritization, and spatial insights designed for
                 action-oriented decisions.
               </p>

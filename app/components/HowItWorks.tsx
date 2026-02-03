@@ -12,31 +12,31 @@ const steps = [
   {
     title: 'Citizen Reporting',
     description:
-      'Users capture and upload real-time evidence of street flooding or drain blockages in Guwahati’s low-lying areas.',
+      'Users upload real-time evidence of drainage issues or street flooding directly from the impact site.',
     icon: CameraIcon,
   },
   {
-    title: 'Geo-Spatial Anchoring',
+    title: 'AI Verification',
     description:
-      'Every report is automatically tagged with precise GPS coordinates to identify exactly where infrastructure is failing.',
-    icon: MapPinIcon,
-  },
-  {
-    title: 'Rule-Based Analysis',
-    description:
-      'The WASP engine correlates report density with rainfall data to identify near-real-time overflow risks.',
+      'The WASP Intelligence layer analyzes the image to verify authenticity and assess the severity of the situation.',
     icon: CpuChipIcon,
   },
   {
-    title: 'Localized Alerting',
+    title: 'Instant Alerting',
     description:
-      'Validated alerts are dispatched to the community, highlighting flood zones and suggested alternative routes.',
+      'Validated reports trigger automated WhatsApp alerts to regional municipal officers with the photo and GPS location.',
     icon: BellAlertIcon,
   },
   {
-    title: 'Municipal Intelligence',
+    title: 'Strategic Routing',
     description:
-      'Data is visualized on a authority dashboard to help municipal teams prioritize drain clearing and flood mitigation.',
+      'The system categorizes incidents by impact levels (1-3) to ensure high-priority blockages are addressed first.',
+    icon: MapPinIcon,
+  },
+  {
+    title: 'MNC Command Center',
+    description:
+      'Data is visualized on a centralized authority dashboard to help municipal teams coordinate flood mitigation efforts.',
     icon: ShieldCheckIcon,
   },
 ];
@@ -49,7 +49,7 @@ export default function HowItWorks() {
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold text-white">
-            How <span className="text-teal-500 italic">WASP</span> Protects
+            How <span className="text-teal-500 italic">WASP</span> Works
           </h2>
           <p className="mt-4 text-gray-400">
             A near-real-time pipeline designed to bridge the gap between citizen 

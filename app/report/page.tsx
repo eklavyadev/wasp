@@ -296,7 +296,7 @@ export default function ReportWaspIssuePage() {
 
         <p className="text-[10px] text-gray-500 mt-6 text-center leading-relaxed">
           WASP Rule Engine will correlate this report with live weather data.<br/>
-          Verified signals will appear on the Urban Resilience Dashboard.
+          Verified Issues will appear on the Urban Resilience Dashboard.
         </p>
       </div>
     </div>
