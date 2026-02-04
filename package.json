@@ -1,0 +1,20 @@
+{
+  "name": "flood-watch-ai",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "@huggingface/inference": "^4.13.11",
+    "groq-sdk": "^0.37.0",
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "twilio": "^5.12.0"
+  }
+}
